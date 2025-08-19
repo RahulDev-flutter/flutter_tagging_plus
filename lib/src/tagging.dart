@@ -189,42 +189,59 @@ class _FlutterTaggingState<T extends Taggable>
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         TypeAheadField<T>(
-          getImmediateSuggestions: widget.enableImmediateSuggestion,
+          // Controller and focus node
+          controller: _textController,
+          focusNode: _focusNode,
+          
+          // Timing configurations
           debounceDuration: widget.debounceDuration,
+          animationDuration: widget.animationDuration,
+          
+          // Hide configurations
           hideOnEmpty: widget.hideOnEmpty,
           hideOnError: widget.hideOnError,
           hideOnLoading: widget.hideOnLoading,
-          animationStart: widget.animationStart,
-          animationDuration: widget.animationDuration,
-          autoFlipDirection:
-              widget.suggestionsBoxConfiguration.autoFlipDirection,
+          
+          // Direction and flip settings from suggestionsBoxConfiguration
           direction: widget.suggestionsBoxConfiguration.direction,
-          hideSuggestionsOnKeyboardHide:
-              widget.suggestionsBoxConfiguration.hideSuggestionsOnKeyboardHide,
-          keepSuggestionsOnLoading:
-              widget.suggestionsBoxConfiguration.keepSuggestionsOnLoading,
-          keepSuggestionsOnSuggestionSelected: widget
-              .suggestionsBoxConfiguration.keepSuggestionsOnSuggestionSelected,
-          suggestionsBoxController:
-              widget.suggestionsBoxConfiguration.suggestionsBoxController,
-          suggestionsBoxDecoration:
-              widget.suggestionsBoxConfiguration.suggestionsBoxDecoration,
-          suggestionsBoxVerticalOffset:
-              widget.suggestionsBoxConfiguration.suggestionsBoxVerticalOffset,
-          errorBuilder: widget.errorBuilder,
+          autoFlipDirection: widget.suggestionsBoxConfiguration.autoFlipDirection,
+          
+          // Show on focus (equivalent to enableImmediateSuggestion)
+          showOnFocus: widget.enableImmediateSuggestion,
+          
+          // Offset from suggestionsBoxConfiguration
+          offset: widget.suggestionsBoxConfiguration.offset ?? Offset.zero,
+          
+          // Transition builder
           transitionBuilder: widget.transitionBuilder,
-          loadingBuilder: (context) =>
-              widget.loadingBuilder?.call(context) ??
-              SizedBox(
-                height: 3.0,
-                child: LinearProgressIndicator(),
-              ),
-          noItemsFoundBuilder: widget.emptyBuilder,
-          textFieldConfiguration: widget.textFieldConfiguration.copyWith(
-            focusNode: _focusNode,
-            controller: _textController,
-            enabled: widget.textFieldConfiguration.enabled,
-          ),
+          
+          // Custom TextField builder
+          builder: (context, controller, focusNode) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: widget.textFieldConfiguration.decoration,
+              style: widget.textFieldConfiguration.style,
+              textAlign: widget.textFieldConfiguration.textAlign,
+              enabled: widget.textFieldConfiguration.enabled,
+              keyboardType: widget.textFieldConfiguration.keyboardType,
+              textInputAction: widget.textFieldConfiguration.textInputAction,
+              textCapitalization: widget.textFieldConfiguration.textCapitalization,
+              autocorrect: widget.textFieldConfiguration.autocorrect,
+              maxLines: widget.textFieldConfiguration.maxLines,
+              minLines: widget.textFieldConfiguration.minLines,
+              maxLength: widget.textFieldConfiguration.maxLength,
+              onChanged: widget.textFieldConfiguration.onChanged,
+              onSubmitted: widget.textFieldConfiguration.onSubmitted,
+              onEditingComplete: widget.textFieldConfiguration.onEditingComplete,
+              onTap: widget.textFieldConfiguration.onTap,
+              scrollPadding: widget.textFieldConfiguration.scrollPadding,
+              textAlignVertical: widget.textFieldConfiguration.textAlignVertical,
+              autofocus: widget.textFieldConfiguration.autofocus,
+            );
+          },
+          
+          // Suggestions callback
           suggestionsCallback: (query) async {
             final suggestions = await widget.findSuggestions(query);
             suggestions.removeWhere(widget.initialItems.contains);
@@ -240,6 +257,8 @@ class _FlutterTaggingState<T extends Taggable>
             }
             return suggestions;
           },
+          
+          // Item builder for suggestions
           itemBuilder: (context, item) {
             final conf = widget.configureSuggestion(item);
             return ListTile(
@@ -267,14 +286,16 @@ class _FlutterTaggingState<T extends Taggable>
                     if (conf.additionWidget != null && _additionItem == item) {
                       return conf.additionWidget!;
                     } else {
-                      return SizedBox(width: 0);
+                      return const SizedBox(width: 0);
                     }
                   },
                 ),
               ),
             );
           },
-          onSuggestionSelected: (suggestion) {
+          
+          // Selection callback
+          onSelected: (suggestion) {
             if (_additionItem != suggestion) {
               widget.initialItems.add(suggestion);
               setState(() {});
@@ -282,7 +303,38 @@ class _FlutterTaggingState<T extends Taggable>
               _textController.clear();
             }
           },
+          
+          // Loading builder
+          loadingBuilder: widget.hideOnLoading ? null : (context) =>
+              widget.loadingBuilder?.call(context) ??
+              const SizedBox(
+                height: 3.0,
+                child: LinearProgressIndicator(),
+              ),
+          
+          // Empty builder
+          emptyBuilder: widget.hideOnEmpty ? null : widget.emptyBuilder,
+          
+          // Error builder
+          errorBuilder: widget.hideOnError ? null : (context, error) =>
+              widget.errorBuilder?.call(context, error) ??
+              ListTile(
+                title: Text('Error: $error'),
+                leading: const Icon(Icons.error),
+              ),
+          
+          // Decoration builder for suggestions box styling
+          decorationBuilder: widget.suggestionsBoxConfiguration.suggestionsBoxDecoration != null 
+              ? (context, child) {
+                  return Container(
+                    decoration: widget.suggestionsBoxConfiguration.suggestionsBoxDecoration,
+                    child: child,
+                  );
+                }
+              : null,
         ),
+        
+        // Tags display using Wrap
         Wrap(
           alignment: widget.wrapConfiguration.alignment,
           crossAxisAlignment: widget.wrapConfiguration.crossAxisAlignment,
