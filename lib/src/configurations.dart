@@ -359,11 +359,11 @@ class SuggestionsBoxConfiguration {
   /// If [AxisDirection.up], the [SuggestionBox] will be above the [TextField]
   /// and the list of suggestion will grow **up**.
   ///
-  /// [AxisDirection.left] and [AxisDirection.right] are not allowed.
+  /// [AxisDirection.left] and [AxisDirection.right] are not supported.
   final AxisDirection direction;
 
   /// The offset for positioning the suggestions box relative to the text field.
-  /// 
+  ///
   /// This replaces the old suggestionsBoxVerticalOffset parameter.
   final Offset? offset;
 
