@@ -335,54 +335,21 @@ class WrapConfiguration {
   });
 }
 
-///
+/// Updated configuration class to work with the latest flutter_typeahead
+/// This replaces the old SuggestionsBoxConfiguration with simplified parameters
 class SuggestionsBoxConfiguration {
-  /// If set to false, the suggestions box will stay opened after
-  /// the keyboard is closed.
-  ///
-  /// Defaults to true.
-  final bool hideSuggestionsOnKeyboardHide;
-
-  /// If set to false, the suggestions box will show a circular
-  /// progress indicator when retrieving suggestions.
-  ///
-  /// Defaults to true.
-  final bool keepSuggestionsOnLoading;
-
-  /// If set to true, the suggestions box will remain opened even after
-  /// selecting a suggestion.
-  ///
-  /// Note that if this is enabled, the only way
-  /// to close the suggestions box is either manually via the
-  /// `SuggestionsBoxController` or when the user closes the software
-  /// keyboard if `hideSuggestionsOnKeyboardHide` is set to true. Users
-  /// with a physical keyboard will be unable to close the
-  /// box without a manual way via `SuggestionsBoxController`.
-  ///
-  /// Defaults to false.
-  final bool keepSuggestionsOnSuggestionSelected;
-
   /// If set to true, in the case where the suggestions box has less than
-  /// _SuggestionsBoxController.minOverlaySpace to grow in the desired [direction], the direction axis
+  /// minimum space to grow in the desired [direction], the direction axis
   /// will be temporarily flipped if there's more room available in the opposite
   /// direction.
   ///
   /// Defaults to false
   final bool autoFlipDirection;
 
-  /// How far below the text field should the suggestions box be
+  /// The decoration of the suggestions box.
   ///
-  /// Defaults to 5.0
-  final double suggestionsBoxVerticalOffset;
-
-  /// The decoration of the material sheet that contains the suggestions.
-  ///
-  /// If null, default decoration with an elevation of 4.0 is used
-  final SuggestionsBoxDecoration suggestionsBoxDecoration;
-
-  /// Used to control the `_SuggestionsBox`. Allows manual control to
-  /// open, close, toggle, or resize the `_SuggestionsBox`.
-  final SuggestionsBoxController? suggestionsBoxController;
+  /// If null, default decoration will be used by the TypeAheadField
+  final BoxDecoration? suggestionsBoxDecoration;
 
   /// Determine the [SuggestionBox]'s direction.
   ///
@@ -395,15 +362,196 @@ class SuggestionsBoxConfiguration {
   /// [AxisDirection.left] and [AxisDirection.right] are not allowed.
   final AxisDirection direction;
 
+  /// The offset for positioning the suggestions box relative to the text field.
+  /// 
+  /// This replaces the old suggestionsBoxVerticalOffset parameter.
+  final Offset? offset;
+
+  /// Border radius for the suggestions box decoration
+  final BorderRadius? borderRadius;
+
+  /// Elevation for the suggestions box
+  final double? elevation;
+
+  /// Background color for the suggestions box
+  final Color? backgroundColor;
+
+  /// Shadow color for the suggestions box
+  final Color? shadowColor;
+
   ///
   const SuggestionsBoxConfiguration({
     this.direction = AxisDirection.down,
     this.autoFlipDirection = false,
-    this.hideSuggestionsOnKeyboardHide = true,
-    this.keepSuggestionsOnLoading = true,
-    this.keepSuggestionsOnSuggestionSelected = false,
-    this.suggestionsBoxController,
-    this.suggestionsBoxDecoration = const SuggestionsBoxDecoration(),
-    this.suggestionsBoxVerticalOffset = 5.0,
+    this.suggestionsBoxDecoration,
+    this.offset,
+    this.borderRadius,
+    this.elevation,
+    this.backgroundColor,
+    this.shadowColor,
   });
+}
+
+/// Simplified TextFieldConfiguration that works with the builder pattern
+/// of the latest flutter_typeahead
+class TextFieldConfiguration {
+  /// Controls the text being edited.
+  ///
+  /// If null, this widget will create its own [TextEditingController].
+  final TextEditingController? controller;
+
+  /// Defines the keyboard focus for this widget.
+  ///
+  /// The [focusNode] is a long-lived object that's typically managed by a
+  /// [StatefulWidget] parent. See [FocusNode] for more information.
+  ///
+  /// To give the keyboard focus to this widget, provide a [focusNode] and then
+  /// use the current [FocusScope] to request the focus:
+  ///
+  /// ```dart
+  /// FocusScope.of(context).requestFocus(myFocusNode);
+  /// ```
+  ///
+  /// This happens automatically when the widget is tapped.
+  ///
+  /// To be notified when the widget gains or loses the focus, add a listener
+  /// to the [focusNode]:
+  ///
+  /// ```dart
+  /// focusNode.addListener(() { print(myFocusNode.hasFocus); });
+  /// ```
+  ///
+  /// If null, this widget will create its own [FocusNode].
+  final FocusNode? focusNode;
+
+  /// The decoration to show around the text field.
+  final InputDecoration decoration;
+
+  /// The style to use for the text being edited.
+  final TextStyle? style;
+
+  /// How the text should be aligned horizontally.
+  final TextAlign textAlign;
+
+  /// If false the text field is "disabled": it ignores taps and its
+  /// [decoration] is rendered in grey.
+  final bool enabled;
+
+  /// The type of keyboard to use for editing the text.
+  final TextInputType? keyboardType;
+
+  /// An action the user has requested the text input control to perform.
+  final TextInputAction? textInputAction;
+
+  /// Configures how the platform keyboard will select an uppercase or
+  /// lowercase keyboard.
+  final TextCapitalization textCapitalization;
+
+  /// Whether to enable autocorrection.
+  final bool autocorrect;
+
+  /// The maximum number of lines to show at one time, wrapping if necessary.
+  final int? maxLines;
+
+  /// The minimum number of lines to occupy when the content spans fewer lines.
+  final int? minLines;
+
+  /// The maximum number of characters (Unicode scalar values) to allow in the
+  /// text field.
+  final int? maxLength;
+
+  /// Called when the user initiates a change to the TextField's value.
+  final ValueChanged<String>? onChanged;
+
+  /// Called when the user indicates that they are done editing the text in the
+  /// field.
+  final ValueChanged<String>? onSubmitted;
+
+  /// Called when the user submits editable content (e.g., user presses the "done"
+  /// button on the keyboard).
+  final VoidCallback? onEditingComplete;
+
+  /// Called for each distinct tap except for every second tap of a double tap.
+  final GestureTapCallback? onTap;
+
+  /// Configures padding to edges surrounding a [Scrollable] when the Textfield scrolls into view.
+  final EdgeInsets scrollPadding;
+
+  /// Controls how tall the selection highlight boxes are computed to be.
+  final TextAlignVertical? textAlignVertical;
+
+  /// Whether this text field should focus itself if nothing else is already focused.
+  final bool autofocus;
+
+  ///
+  const TextFieldConfiguration({
+    this.controller,
+    this.focusNode,
+    this.decoration = const InputDecoration(),
+    this.style,
+    this.textAlign = TextAlign.start,
+    this.enabled = true,
+    this.keyboardType,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
+    this.autocorrect = true,
+    this.maxLines = 1,
+    this.minLines,
+    this.maxLength,
+    this.onChanged,
+    this.onSubmitted,
+    this.onEditingComplete,
+    this.onTap,
+    this.scrollPadding = const EdgeInsets.all(20.0),
+    this.textAlignVertical,
+    this.autofocus = false,
+  });
+
+  /// Creates a copy of this configuration with the given fields replaced with
+  /// the new values.
+  TextFieldConfiguration copyWith({
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration? decoration,
+    TextStyle? style,
+    TextAlign? textAlign,
+    bool? enabled,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    TextCapitalization? textCapitalization,
+    bool? autocorrect,
+    int? maxLines,
+    int? minLines,
+    int? maxLength,
+    ValueChanged<String>? onChanged,
+    ValueChanged<String>? onSubmitted,
+    VoidCallback? onEditingComplete,
+    GestureTapCallback? onTap,
+    EdgeInsets? scrollPadding,
+    TextAlignVertical? textAlignVertical,
+    bool? autofocus,
+  }) {
+    return TextFieldConfiguration(
+      controller: controller ?? this.controller,
+      focusNode: focusNode ?? this.focusNode,
+      decoration: decoration ?? this.decoration,
+      style: style ?? this.style,
+      textAlign: textAlign ?? this.textAlign,
+      enabled: enabled ?? this.enabled,
+      keyboardType: keyboardType ?? this.keyboardType,
+      textInputAction: textInputAction ?? this.textInputAction,
+      textCapitalization: textCapitalization ?? this.textCapitalization,
+      autocorrect: autocorrect ?? this.autocorrect,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
+      maxLength: maxLength ?? this.maxLength,
+      onChanged: onChanged ?? this.onChanged,
+      onSubmitted: onSubmitted ?? this.onSubmitted,
+      onEditingComplete: onEditingComplete ?? this.onEditingComplete,
+      onTap: onTap ?? this.onTap,
+      scrollPadding: scrollPadding ?? this.scrollPadding,
+      textAlignVertical: textAlignVertical ?? this.textAlignVertical,
+      autofocus: autofocus ?? this.autofocus,
+    );
+  }
 }
